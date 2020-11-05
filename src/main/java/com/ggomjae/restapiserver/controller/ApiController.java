@@ -1,6 +1,9 @@
 package com.ggomjae.restapiserver.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -12,10 +15,15 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
     URI 클래스는 URL 클래스보다 표준사항을 더 잘 따른다.
     URI 객체는 상대적 URI를 표현할 수 있다.
  */
+import javax.validation.Valid;
 import java.net.URI;
+import java.util.Locale;
 
 @RestController
 public class ApiController {
+
+    @Autowired
+    private MessageSource messageSource;
 
     @GetMapping("/users/{id}")
     public User findUser(@PathVariable int id){
@@ -32,7 +40,7 @@ public class ApiController {
         ResponseEntity는 HttpEntity를 상속받음으로써 HttpHeader와 body를 가질 수 있다
      */
     @PostMapping("/users")
-    public ResponseEntity<User> statusEx(@RequestBody User user){
+    public ResponseEntity<User> statusEx(@Valid @RequestBody User user){
         User savedUser = service.save(user);
 
         /*
@@ -50,4 +58,9 @@ public class ApiController {
         return ResponseEntity.created(location);
     }
 
+    @GetMapping(path = "/example/interationalized")
+    public String interationalizedMethod(
+            @RequestHeader(name = "Accept-Language", required=false) Locale locale){
+            return messageSource.getMessage("example.message", null,locale);
+    }
 }

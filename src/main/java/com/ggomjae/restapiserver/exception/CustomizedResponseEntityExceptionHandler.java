@@ -1,8 +1,10 @@
 package com.ggomjae.restapiserver.exception;
 
 import com.ggomjae.restapiserver.controller.UserNotFoundException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,5 +33,20 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
                 new ExceiptionResponse(new Date(),ex.getMessage(), request.getDescription(false));
 
         return new ResponseEntity(exceiptionResponse, HttpStatus.NOT_FOUND);
+    }
+
+    /*
+        ResponseEntityExceptionHandler 에 Ctrl을 누르고 왼쪽 마우스 눌러서 handleMethodArgumentNotValid 찾고 오버라이딩
+     */
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
+                                                                  HttpHeaders headers,
+                                                                  HttpStatus status,
+                                                                  WebRequest request) {
+        // message가 너무 길어서 저렇게 바꿔줬음. "Validation Error" 로.
+        ExceiptionResponse exceiptionResponse =
+                new ExceiptionResponse(new Date(),"Validation Error", ex.getBindingResult().toString());
+
+        return new ResponseEntity(exceiptionResponse,HttpStatus.BAD_REQUEST);
     }
 }
