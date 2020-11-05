@@ -9,5 +9,5 @@ public class RestapiserverApplication {
     public static void main(String[] args) {
         SpringApplication.run(RestapiserverApplication.class, args);
     }
-
+    
 }
