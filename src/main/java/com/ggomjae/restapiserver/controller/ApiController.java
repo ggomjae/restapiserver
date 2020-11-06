@@ -1,8 +1,13 @@
 package com.ggomjae.restapiserver.controller;
 
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import com.ggomjae.restapiserver.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -63,4 +68,21 @@ public class ApiController {
             @RequestHeader(name = "Accept-Language", required=false) Locale locale){
             return messageSource.getMessage("example.message", null,locale);
     }
+
+    @GetMapping("/admin/users/{id}")
+    public MappingJacksonValue retrieveUser(@PathVariable int id){
+        User user = service.findOne(id);
+
+        SimpleBeanPropertyFilter simpleBeanPropertyFilter = SimpleBeanPropertyFilter
+                .filterOutAllExcept("id");
+
+        // UserInfo는 Entitiy에 @JsonFilter 이름을 설정해둔 그 이름이다.
+        FilterProvider filters = new SimpleFilterProvider().addFilter("UserInfo",simpleBeanPropertyFilter);
+
+        MappingJacksonValue mappingJacksonValue =  new MappingJacksonValue(user);
+        mappingJacksonValue.setFilters(filters);
+
+        return mappingJacksonValue;
+    }
+
 }
